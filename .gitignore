@@ -1,0 +1,4 @@
+.pio/
+__pycache__/
+.vscode/
+*.pyc
