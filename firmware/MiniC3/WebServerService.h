@@ -59,4 +59,7 @@ private:
     int otaExpected = 0;
 };
 
+// v1.12.0: last time someone used the web panel (millis)
+extern volatile uint32_t gLastWebActivity;
+
 #endif

@@ -67,7 +67,10 @@ void WebServerService::handleClient() {
     server.handleClient();
 }
 
+volatile uint32_t gLastWebActivity = 0;   // v1.12.0: the battery saver does not sleep while the panel is in use
+
 void WebServerService::handleRoot() {
+  gLastWebActivity = millis();
   if (isLoadingData()) {
     server.send(503, "text/html",
       "<!doctype html><html lang='es'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
@@ -217,6 +220,9 @@ void WebServerService::handleRoot() {
   add("<label class='checkbox-label mt-0' style='margin-top: 10px !important;'><input type='checkbox' id='autoCycle' name='auto_cycle' value='1' " + String(config.screen_auto_cycle ? "checked" : "") + "> Cambiar de pantalla automáticamente</label>");
   add("<p class='help-text mt-0'>Si está desactivado, las pantallas solo cambian con los botones.</p>");
   add("<label>Cambiar de pantalla cada (seg):</label><input type='number' id='screenIntInput' name='screen_int' value='" + String(config.screen_interval_sec) + "'>");
+  add("<label>Brillo de la pantalla: <b id='brightnessVal'>" + String(config.brightness) + "</b> de 5</label><input type='range' min='1' max='5' step='1' id='brightness' name='brightness' value='" + String(config.brightness) + "' oninput=\"document.getElementById('brightnessVal').innerText=this.value\" style='width:100%'>");
+  add("<label class='checkbox-label mt-0' style='margin-top: 10px !important;'><input type='checkbox' id='powerSaver' name='power_saver' value='1' " + String(config.power_saver ? "checked" : "") + "> Modo ahorro de batería</label>");
+  add("<p class='help-text mt-0'>Con el modo ahorro, la pantalla baja al mínimo a los 20 s sin tocar nada y la consola se suspende sola a los 3 minutos (la despiertan ← o →). Además el WiFi y el procesador van más despacio cuando no estás jugando. También se cambia en la consola: tocá A, página Ajustes.</p>");
 
   add("<label class='anim-label'>Animaciones activas:</label>");
   add("<p class='help-text mt-0' style='margin-bottom: 10px;'>Si destildás 'Ninguna', elegí qué animaciones usar.</p>");
@@ -1078,7 +1084,7 @@ void WebServerService::handleRoot() {
   add("  city: ['general','city'], timezone: ['general','timezone'], date_display: ['general','date_display'],");
   add("  theme_bg: ['theme','bg'], theme_card: ['theme','card'], theme_accent: ['theme','accent'], theme_text: ['theme','text'],");
   add("  night_mode: ['night','mode'], night_start: ['night','start'], night_end: ['night','end'], night_action: ['night','action'], night_dim_start: ['night','dim_start'],");
-  add("  auto_cycle: ['screens','auto_cycle'], screen_int: ['screens','interval_sec'], anim_mask: ['screens','anim_mask'], screen_order: ['screens','order'],");
+  add("  auto_cycle: ['screens','auto_cycle'], screen_int: ['screens','interval_sec'], brightness: ['screens','brightness'], power_saver: ['screens','power_saver'], anim_mask: ['screens','anim_mask'], screen_order: ['screens','order'],");
   add("  show_time: ['screens','show_time'], show_calendar: ['screens','show_calendar'], show_weather: ['screens','show_weather'], show_aqi: ['screens','show_aqi'],");
   add("  show_daylight: ['screens','show_daylight'], show_moon: ['screens','show_moon'], show_iss: ['screens','show_iss'], show_flight: ['screens','show_flight'], show_population: ['screens','show_population'], show_pc: ['screens','show_pc'],");
   add("  show_media: ['screens','show_media'], show_stock: ['screens','show_stock'], show_crypto: ['screens','show_crypto'], show_currency: ['screens','show_currency'],");
@@ -1180,6 +1186,8 @@ void WebServerService::handleRoot() {
 
   add("    setVal('refresh_min', c.general.refresh_min);");
   add("    setCb('autoCycle', c.screens.auto_cycle);");
+  add("    if (c.screens.brightness) { setVal('brightness', c.screens.brightness); const bv = document.getElementById('brightnessVal'); if (bv) bv.innerText = c.screens.brightness; }");
+  add("    setCb('powerSaver', c.screens.power_saver);");
   add("    setVal('screen_int', c.screens.interval_sec);");
   add("    setRadio('time_format', c.general.time_format);");
 
@@ -1432,6 +1440,7 @@ void WebServerService::handleRoot() {
 }
 
 void WebServerService::handleSave() {
+  gLastWebActivity = millis();
   if (!server.hasArg("plain")) {
     server.send(HTTP_BAD_REQUEST, "text/plain", "Body not received");
     return;
@@ -1453,6 +1462,7 @@ void WebServerService::handleSave() {
 }
 
 void WebServerService::handleUpdate() {
+  gLastWebActivity = millis();
   if (isLoadingData()) {
     server.send(503, "application/json", "{}");
     return;
@@ -1517,6 +1527,7 @@ void WebServerService::handleUsbReconnect() {
 // ---------------------------------------------------------------------------
 
 void WebServerService::handleOtaPage() {
+  gLastWebActivity = millis();
   if (!server.authenticate(OTA_WEB_USER, OTA_PASSWORD)) {
     server.requestAuthentication(BASIC_AUTH, "Mini C3", "Usuario: admin, clave: la de OTA");
     return;
@@ -1629,6 +1640,7 @@ void WebServerService::handleOtaDone() {
 // ---------------------------------------------------------------------------
 
 void WebServerService::handleMessagePage() {
+  gLastWebActivity = millis();
   String html;
   html.reserve(4200);
   html += F("<!doctype html><html lang='es'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>");
@@ -1678,6 +1690,7 @@ void WebServerService::handleMessageStatus() {
 // ---------------------------------------------------------------------------
 
 void WebServerService::handleSpotifyPage() {
+  gLastWebActivity = millis();
   const SpotifyState& sp = state->spotify;
   bool linked = spotifyService.isConfigured();
 
@@ -1789,6 +1802,7 @@ bool WebServerService::wifiAuth() {
 }
 
 void WebServerService::handleWifiPage() {
+  gLastWebActivity = millis();
   if (!wifiAuth()) return;
   bool online = (WiFi.status() == WL_CONNECTED);
   String current = online ? WiFi.SSID() : String("");

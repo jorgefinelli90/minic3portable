@@ -2178,7 +2178,10 @@ void DisplayService::switchToPreviousScreen(const AppState& state, bool skipSubS
 }
 
 void DisplayService::setContrast(bool dim) {
-    display.setContrast(dim ? CONTRAST_DIM : CONTRAST_MAX);
+    // 5 brightness levels (the SH1106 contrast register goes 0..255; the eye
+    // notices the low end much more, hence the uneven steps)
+    static const uint8_t LEVELS[5] = {1, 16, 48, 120, CONTRAST_MAX};
+    display.setContrast(dim ? CONTRAST_DIM : LEVELS[brightnessLevel - 1]);
 }
 
 int DisplayService::getNextAnimationEffect(uint16_t mask) {

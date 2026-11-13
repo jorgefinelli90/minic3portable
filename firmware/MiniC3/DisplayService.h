@@ -151,6 +151,9 @@ public:
 
 
     void setContrast(bool dim);
+    // v1.12.0: brightness level 1..5 used when the screen is not dimmed
+    void setBrightness(int level) { brightnessLevel = constrain(level, 1, 5); }
+    int getBrightness() const { return brightnessLevel; }
 
 private:
     uint8_t screenBufferOld[1024];
@@ -216,6 +219,7 @@ private:
 
     static const int CONTRAST_DIM = 1;
     static const int CONTRAST_MAX = 255;
+    int brightnessLevel = 5;
 
     int getFirstEnabledScreen(const AppState& state);
     int subItemCount(const AppState& state, int screenIndex);

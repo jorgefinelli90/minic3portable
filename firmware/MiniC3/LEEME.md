@@ -1,4 +1,4 @@
-# Mini C3 — firmware v1.11.0
+# Mini C3 — firmware v1.12.0
 
 Firmware para la Mini C3, adaptado de **Tinytosh** de Vladimir Gitsarev (licencia MIT, ver `LICENSE`).
 
@@ -39,9 +39,9 @@ Tocá **A** en cualquier pantalla donde A no tenga otro uso (hora, clima, calend
 
 | Tecla | Qué hace |
 |---|---|
-| ← / → | Cambian de página: **Red · Equipo · Servicios · Acciones** |
-| ↑ / ↓ | Bajan por la lista de servicios / eligen una acción |
-| A | En Acciones ejecuta la opción. En las otras páginas cierra. |
+| ← / → | Cambian de página: **Red · Equipo · Servicios · Ajustes · Acciones** |
+| ↑ / ↓ | Bajan por la lista de servicios / eligen un ajuste o una acción |
+| A | En Ajustes cambia el ajuste elegido. En Acciones ejecuta la opción. En las otras páginas cierra. |
 | A mantenida | Cierra |
 
 Se cierra sola a los 20 s sin tocar nada.
@@ -49,6 +49,9 @@ Se cierra sola a los 20 s sin tocar nada.
 - **Red:** a qué WiFi está conectada, señal, IP, minic3.local y si la OTA está lista.
 - **Equipo:** versión, batería, cuánto hace que está prendida, memoria libre y auto-ciclo.
 - **Servicios:** cada dato con su estado: ✓ ok (y hace cuánto se actualizó), ✗ error / sin datos, … esperando, » salteado.
+- **Ajustes** (nuevo en v1.12.0): se guardan solos y quedan después de apagarla.
+  - **Brillo:** cada A lo sube un nivel (1 a 5; después del 5 vuelve al 1). Se ve en el momento.
+  - **Modo ahorro:** A lo prende o lo apaga. Ver [Modo ahorro](#modo-ahorro).
 - **Acciones:**
   - **Recargar datos:** vuelve a cargar todo en el momento, incluido lo que se había salteado. Sin reiniciar.
   - **Reiniciar:** pide tocar A de nuevo para confirmar. Después del reinicio prueba otra vez todos los servicios, también los que se habían salteado.
@@ -268,6 +271,26 @@ Anotador con fósforos: cuadraditos de 5, las malas arriba y las buenas abajo de
 - Lo salteado vuelve a cargarse al apagar y prender con el interruptor, al guardar en el panel web, o desde el panel del equipo (A → Acciones → Recargar datos o Reiniciar).
 - El panel web y la OTA arrancan **antes** de cargar los datos, así que siempre se puede actualizar el firmware.
 
+## Modo ahorro
+
+Se prende en el panel del equipo (A → página **Ajustes** → Modo ahorro) o en el panel web (Ajustes generales). Viene apagado.
+
+Con el modo ahorro:
+
+- **La pantalla baja al mínimo** a los 20 s sin tocar ninguna tecla. La primera tecla que toques la vuelve al brillo elegido y además hace lo suyo.
+- **Se suspende sola a los 3 minutos sin tocar nada.** Es la misma suspensión que mantener ↑ 3 s, y la despiertan ← o →.
+  - Antes avisa durante 5 s con una barra: cualquier tecla lo cancela y esa tecla no hace nada más.
+  - No se duerme mientras usás el panel web (si la página está abierta, cuenta como uso).
+  - Mientras está dormida no llegan mensajes. Un mensaje que llega antes reinicia la cuenta, así tenés tiempo de leerlo.
+- **El procesador va a 80 MHz** en vez de 160 cuando no estás jugando. Los juegos siempre van a 160.
+- **El WiFi usa su ahorro más profundo**: la radio duerme entre avisos del router. El panel web y la OTA andan igual, solo responden un poco más lento.
+
+Lo del WiFi al jugar y en el anotador (abajo) funciona siempre, con o sin modo ahorro.
+
+## Brillo
+
+5 niveles, desde el panel del equipo (A → Ajustes → Brillo) o con la barra **Brillo de la pantalla** del panel web. El modo noche con "atenuar" sigue bajándola al mínimo a la noche, sea cual sea el brillo elegido.
+
 ## Ahorro de batería al jugar
 
 El WiFi es lo que más batería gasta, y los juegos y el anotador no lo necesitan.
@@ -374,7 +397,7 @@ A partir de ahora todo se actualiza sin cable, de dos formas:
 - `WifiService`: varias redes guardadas, conexión a la mejor y cambio automático (nuevo en v1.5.0).
 - `GameService` y `Arkanoid`: la pantalla de juegos (nuevo en v1.5.0).
 - `MessageInbox`: la bandeja de mensajes con lista, lectura y borrado (nuevo en v1.9.0).
-- `InfoPanel`: el panel del equipo con páginas y acciones (nuevo en v1.6.0).
+- `InfoPanel`: el panel del equipo con páginas y acciones (nuevo en v1.6.0), y la página Ajustes con brillo y modo ahorro (v1.12.0).
 - `Tetris` y `Flappy`: los juegos 3 y 4 (nuevo en v1.10.0).
 - `PolledGame` y `GameUi`: base común de los juegos nuevos (pausa, pantalla final, récords, LED) (nuevo en v1.11.0).
 - `Snake`, `Game2048`, `Minesweeper`, `Invaders` y `Simon`: Viborita, 2048, Buscaminas, Invasores y Simón (nuevo en v1.11.0).

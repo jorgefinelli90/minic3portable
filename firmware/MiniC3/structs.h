@@ -136,6 +136,10 @@ struct Config {
   bool show_games = true;
   bool show_truco = true;
 
+  // v1.12.0: screen brightness 1..5 and battery saver (device panel > Ajustes)
+  int brightness = 5;
+  bool power_saver = false;
+
   bool hide_empty_pc = true;
   bool hide_empty_media = true;
   bool hide_empty_bambu = true;

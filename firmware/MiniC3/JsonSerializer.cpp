@@ -64,6 +64,8 @@ void JsonSerializer::populateConfigDoc(const Config& config, JsonObject configOb
     screens["show_spotify"] = config.show_spotify ? 1 : 0;
     screens["show_games"] = config.show_games ? 1 : 0;
     screens["show_truco"] = config.show_truco ? 1 : 0;
+    screens["brightness"] = config.brightness;
+    screens["power_saver"] = config.power_saver ? 1 : 0;
     screens["hide_empty_pc"] = config.hide_empty_pc ? 1 : 0;
     screens["hide_empty_media"] = config.hide_empty_media ? 1 : 0;
     screens["hide_empty_bambu"] = config.hide_empty_bambu ? 1 : 0;
@@ -401,6 +403,8 @@ bool JsonSerializer::parseConfig(const char* jsonString, AppState& state) {
         if (g.containsKey("show_spotify")) config.show_spotify = g["show_spotify"] == 1;
         if (g.containsKey("show_games")) config.show_games = g["show_games"] == 1;
         if (g.containsKey("show_truco")) config.show_truco = g["show_truco"] == 1;
+        if (g.containsKey("brightness")) config.brightness = constrain((int)g["brightness"], 1, 5);
+        if (g.containsKey("power_saver")) config.power_saver = g["power_saver"] == 1;
         if (g.containsKey("hide_empty_pc")) config.hide_empty_pc = g["hide_empty_pc"] == 1;
         if (g.containsKey("hide_empty_media")) config.hide_empty_media = g["hide_empty_media"] == 1;
         if (g.containsKey("hide_empty_bambu")) config.hide_empty_bambu = g["hide_empty_bambu"] == 1;

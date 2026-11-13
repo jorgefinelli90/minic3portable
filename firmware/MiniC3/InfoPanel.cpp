@@ -15,7 +15,7 @@ extern OtaService otaService;
 extern DataSyncService dataSyncService;
 extern WifiService wifiService;
 
-static const char* const PAGE_TITLES[InfoPanel::PAGE_COUNT] = {"Red", "Equipo", "Servicios", "Acciones"};
+static const char* const PAGE_TITLES[InfoPanel::PAGE_COUNT] = {"Red", "Equipo", "Servicios", "Ajustes", "Acciones"};
 static const char* const ACTION_NAMES[] = {"Recargar datos", "Reiniciar", "Agregar WiFi", "Apagar", "Cerrar"};
 
 // 5x5 status icons (bit 4 = left pixel)
@@ -59,6 +59,7 @@ void InfoPanel::open(const AppState& state) {
     isOpenNow = true;
     page = PAGE_NET;
     sel = 0;
+    setSel = 0;
     scroll = 0;
     confirmSel = -1;
     slideDir = 0;
@@ -88,6 +89,8 @@ InfoPanel::Action InfoPanel::handleInput(InputEvent e, const AppState& state) {
             if (page == PAGE_ACTIONS) {
                 sel = (sel + ACTION_COUNT + d) % ACTION_COUNT;
                 confirmSel = -1;
+            } else if (page == PAGE_SETTINGS) {
+                setSel = (setSel + SETTING_COUNT + d) % SETTING_COUNT;
             } else if (page == PAGE_SERVICES) {
                 Row rows[MAX_ROWS];
                 int n = buildServices(state, rows);
@@ -97,6 +100,10 @@ InfoPanel::Action InfoPanel::handleInput(InputEvent e, const AppState& state) {
         }
 
         case INPUT_TOUCH_TAP:
+            if (page == PAGE_SETTINGS) {
+                // the sketch changes it, saves it and redraws the panel
+                return setSel == 0 ? ACT_BRIGHTNESS : ACT_SAVER;
+            }
             if (page != PAGE_ACTIONS) {
                 close();
                 return ACT_NONE;
@@ -408,6 +415,55 @@ void InfoPanel::drawPage(const AppState& state) {
                 int y = 12 + (track - h) * scroll / (n - VISIBLE_ROWS);
                 d.drawFastVLine(127, 12, track, SH110X_WHITE);
                 d.fillRect(126, y, 2, h, SH110X_WHITE);
+            }
+            break;
+        }
+
+        case PAGE_SETTINGS: {
+            const Config& c = state.config;
+            for (int i = 0; i < SETTING_COUNT; i++) {
+                int y = Y[i];
+                bool selected = (i == setSel);
+                uint16_t fg = selected ? SH110X_BLACK : SH110X_WHITE;
+                if (selected) d.fillRect(0, y - 2, 128, 11, SH110X_WHITE);
+                d.setTextColor(fg);
+                d.setCursor(4, y);
+                d.print(selected ? "> " : "  ");
+                if (i == 0) {
+                    d.print("Brillo");
+                    // 5 bars that grow, filled up to the level
+                    for (int b = 0; b < 5; b++) {
+                        int h = 2 + b;
+                        int bx = 96 + b * 6;
+                        if (b < c.brightness) d.fillRect(bx, y + 7 - h, 4, h, fg);
+                        else d.drawFastHLine(bx, y + 6, 4, fg);
+                    }
+                } else {
+                    d.print("Modo ahorro");
+                    rightText(c.power_saver ? "SI" : "NO", y, 122);
+                }
+                d.setTextColor(SH110X_WHITE);
+            }
+            d.drawFastHLine(0, 31, 128, SH110X_WHITE);
+            if (setSel == 0) {
+                d.setCursor(0, 35);
+                d.print("A cambia el brillo");
+                d.setCursor(0, 45);
+                d.print("(1 a 5, y vuelve a 1)");
+            } else if (c.power_saver) {
+                d.setCursor(0, 35);
+                d.print("Atenua a los 20 s y");
+                d.setCursor(0, 45);
+                d.print("se duerme a los 3 min");
+                d.setCursor(0, 55);
+                d.print("sin tocar. A: apagar");
+            } else {
+                d.setCursor(0, 35);
+                d.print("A lo prende: atenua,");
+                d.setCursor(0, 45);
+                d.print("se duerme sola y el");
+                d.setCursor(0, 55);
+                d.print("WiFi gasta menos");
             }
             break;
         }

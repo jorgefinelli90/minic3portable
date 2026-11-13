@@ -136,7 +136,7 @@ Batería → TP4056 → interruptor → 5V del C3-Zero. **Apagá el interruptor 
 ## 🛠️ Armado
 
 1. Grabá el firmware **antes de cerrar**.
-   - Desde Chrome, en esptool-js, cargá `minic3_v1.11.0_factory.bin` en la dirección **0x0**. No hay que instalar nada.
+   - Desde Chrome, en esptool-js, cargá `minic3_v1.12.0_factory.bin` en la dirección **0x0**. No hay que instalar nada.
 2. Teclas → pulsadores (calzan con un *clic*) → táctil → OLED → interruptor.
 3. Pegá el ESP32 y el cargador en la tapa con doble faz y cableá. Poné la batería con goma espuma.
 4. Cerrá la tapa a presión.
@@ -221,7 +221,7 @@ Also:
 - Touch → GPIO 7.
 - Battery → TP4056 → switch → 5V pin.
 
-**Flashing:** flash `minic3_v1.11.0_factory.bin` at **0x0** with esptool-js in Chrome, then join the **MiniC3-Setup** WiFi (password `minic3setup`).
+**Flashing:** flash `minic3_v1.12.0_factory.bin` at **0x0** with esptool-js in Chrome, then join the **MiniC3-Setup** WiFi (password `minic3setup`).
 
 Full guide in the GitHub repo.
 

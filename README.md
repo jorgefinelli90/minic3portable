@@ -65,6 +65,7 @@ Además:
 - **Varias redes WiFi guardadas**: se conecta a la mejor y cambiar de red no borra nada.
 - **OTA**: subís el `.bin` desde el navegador en `http://minic3.local/ota`.
 - **Suspensión** (↑ mantenida 3 s). Solo la despiertan ← o →, así no se prende sola en el bolsillo.
+- **Ajustes de brillo y modo ahorro** (5 niveles de brillo; el modo ahorro atenúa la pantalla, se suspende sola a los 3 min y baja el consumo del WiFi y del procesador).
 
 ## Qué hay en este repo
 
@@ -72,7 +73,7 @@ Además:
 |---|---|
 | [`caja/`](caja/) | STL listos para imprimir, modelos paramétricos en Python e instrucciones de armado y conexiones ([LEEME](caja/LEEME.md)) |
 | [`firmware/MiniC3/`](firmware/MiniC3/) | Código fuente (PlatformIO, librerías incluidas en `lib/`) y manual completo ([LEEME](firmware/MiniC3/LEEME.md)) |
-| [`firmware/binarios/`](firmware/binarios/) | `minic3_v1.11.0_factory.bin` (primera carga por USB) y `minic3_v1.11.0_ota.bin` (actualización por WiFi) |
+| [`firmware/binarios/`](firmware/binarios/) | `minic3_v1.12.0_factory.bin` (primera carga por USB) y `minic3_v1.12.0_ota.bin` (actualización por WiFi) |
 | [`imagenes/`](imagenes/) | Fotos, capturas y vistas de la caja |
 
 ## Materiales
@@ -106,7 +107,7 @@ Batería → TP4056 → interruptor → 5V del C3-Zero. **Apagá el interruptor 
 **Sin instalar nada** (Chrome o Edge):
 
 1. Entrá a [esptool-js](https://espressif.github.io/esptool-js/) y conectá la placa por USB-C.
-2. Cargá `firmware/binarios/minic3_v1.11.0_factory.bin` en la dirección **0x0** y programá.
+2. Cargá `firmware/binarios/minic3_v1.12.0_factory.bin` en la dirección **0x0** y programá.
    - Si no aparece la placa: mantené BOOT, tocá RESET y soltá BOOT.
 
 **Con PlatformIO:** abrí `firmware/MiniC3` y corré `pio run -e minic3 -t upload`.
@@ -147,7 +148,7 @@ Los controles de cada juego están en el [manual del firmware](firmware/MiniC3/L
 
 The firmware is based on **[Tinytosh](https://makerworld.com/es/models/2270326-tinytosh-mini-retro-pc-smart-wifi-display-esp32)** by Uladzimir Hitsarau (MIT), adapted for a portable, button-driven device. The UI is in Spanish.
 
-- Flash `firmware/binarios/minic3_v1.11.0_factory.bin` at **0x0** with [esptool-js](https://espressif.github.io/esptool-js/), then join the **MiniC3-Setup** WiFi (password `minic3setup`, page `192.168.4.1`) to configure.
+- Flash `firmware/binarios/minic3_v1.12.0_factory.bin` at **0x0** with [esptool-js](https://espressif.github.io/esptool-js/), then join the **MiniC3-Setup** WiFi (password `minic3setup`, page `192.168.4.1`) to configure.
 - Print the STLs in `caja/stl/`. Wiring and assembly are in `caja/LEEME.md`.
 
 ## Licencia

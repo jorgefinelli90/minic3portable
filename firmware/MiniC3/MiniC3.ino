@@ -105,6 +105,28 @@ const uint32_t TRUCO_RADIO_OFF_MS = 60000;
 bool radioSaving = false;
 uint32_t trucoScreenSince = 0;
 
+// v1.12.0 battery saver (device panel > Ajustes, or the web panel): dims the
+// screen after 20 s without keys, sleeps after 3 min (5 s warning first), and
+// runs the CPU at 80 MHz and the WiFi in its deepest modem sleep while you are
+// not playing.
+const uint32_t SAVER_DIM_MS = 20000;
+const uint32_t SAVER_SLEEP_MS = 180000;
+const uint32_t SAVER_WARN_MS = 5000;
+uint32_t lastUserInput = 0;
+bool saverCountdown = false;   // the "going to sleep" bar is on screen
+bool saverDimmed = false;
+
+uint32_t idleMs() {
+  uint32_t last = lastUserInput;
+  uint32_t web = gLastWebActivity;
+  if ((int32_t)(web - last) > 0) last = web;
+  return millis() - last;
+}
+
+bool saverDimWanted() {
+  return appState.config.power_saver && idleMs() >= SAVER_DIM_MS;
+}
+
 
 // ---------------------------------------------------------------------------
 //  Input
@@ -155,6 +177,22 @@ void runInfoAction(InfoPanel::Action act) {
       sleepRequested = true;   // done from loop(), outside the state lock
       break;
 
+    case InfoPanel::ACT_BRIGHTNESS:
+      // 1 → 2 → … → 5 → 1, seen right away
+      appState.config.brightness = appState.config.brightness % 5 + 1;
+      displayService.setBrightness(appState.config.brightness);
+      displayService.setContrast(false);
+      configManager.saveConfig(appState.config);
+      infoPanel.redraw(appState);
+      break;
+
+    case InfoPanel::ACT_SAVER:
+      appState.config.power_saver = !appState.config.power_saver;
+      configManager.saveConfig(appState.config);
+      Serial.println(appState.config.power_saver ? "Ahorro: modo ahorro SI" : "Ahorro: modo ahorro NO");
+      infoPanel.redraw(appState);
+      break;
+
     default:
       break;
   }
@@ -202,6 +240,8 @@ void showIncomingMessage() {
   StateLock lock;
   int activeAction = TimeService::getActiveNightAction(appState.config);
   if (nightModeService.wasScreenOff(activeAction)) nightModeService.recordInteraction();
+  lastUserInput = millis();   // the battery saver gives you time to read it
+  saverDimmed = false;
   displayService.setContrast(false);
   displayService.playMessageAlert();
   messageInbox.openReader(0);
@@ -274,6 +314,20 @@ bool handleSpotifyInput(InputEvent event) {
 
 void handleInput(InputEvent event, bool repeat) {
   if (gOtaInProgress) return;
+
+  // Battery saver: any key counts as activity. During the "going to sleep"
+  // warning the key only cancels it.
+  lastUserInput = millis();
+  if (saverCountdown) {
+    saverCountdown = false;
+    nightModeService.recordInteraction();   // redraw the normal screen
+    return;
+  }
+  if (saverDimmed && !nightModeService.isLatched()) {
+    saverDimmed = false;
+    StateLock lock;
+    displayService.setContrast(false);   // back to the chosen brightness at once
+  }
 
   if (event == INPUT_UP_LONG) {
     sleepRequested = true;   // done from loop(), outside the state lock
@@ -446,6 +500,8 @@ void goToSleep() {
 
   infoPanel.close();
   lastScreenSwitch = millis();
+  lastUserInput = millis();
+  saverDimmed = false;
   nightModeService.recordInteraction();
 
   // WiFi comes back in the background: the latest network first, and if it
@@ -495,6 +551,77 @@ void updateRadioSaving() {
     wifiService.reconnect();   // onNetworkBack() runs when it connects
     Serial.println("Ahorro: WiFi de vuelta");
   }
+}
+
+// --- Battery saver (v1.12.0) ---------------------------------------------------
+// Runs every loop: brightness level, CPU speed and WiFi power save.
+void updatePowerSaver() {
+  displayService.setBrightness(appState.config.brightness);
+  bool saver = appState.config.power_saver;
+
+  // 80 MHz is plenty for the screens and the network; games always get 160
+  uint32_t mhz = (saver && !gameService.inGame()) ? 80 : 160;
+  if (getCpuFrequencyMhz() != mhz) setCpuFrequencyMhz(mhz);
+
+  // WiFi modem sleep: the deepest one with the saver (the radio sleeps between
+  // beacons; the web panel answers a bit slower). Set again after each reconnect.
+  static int appliedPs = -1;
+  if (WiFi.status() == WL_CONNECTED) {
+    if (appliedPs != (saver ? 1 : 0)) {
+      WiFi.setSleep(saver ? WIFI_PS_MAX_MODEM : WIFI_PS_MIN_MODEM);
+      appliedPs = saver ? 1 : 0;
+    }
+  } else {
+    appliedPs = -1;
+  }
+}
+
+// After 3 min without keys (and nobody using the web panel) it goes to sleep,
+// like holding ↑. The last 5 s show a bar; any key cancels it. Returns true
+// while the bar is on screen.
+bool updateSaverSleep() {
+  static uint32_t lastDraw = 0;
+  uint32_t idle = idleMs();
+
+  if (!appState.config.power_saver || idle < SAVER_SLEEP_MS - SAVER_WARN_MS) {
+    if (saverCountdown) {
+      saverCountdown = false;
+      nightModeService.recordInteraction();
+    }
+    return false;
+  }
+  if (idle >= SAVER_SLEEP_MS) {
+    saverCountdown = false;
+    Serial.println("Ahorro: 3 min sin tocar, a dormir");
+    sleepRequested = true;   // loop() does it on the next turn
+    return true;
+  }
+
+  if (!saverCountdown) gameService.pause();   // a game left alone stays paused
+  saverCountdown = true;
+  if (millis() - lastDraw >= 100) {
+    lastDraw = millis();
+    uint32_t left = SAVER_SLEEP_MS - idle;
+    StateLock lock;
+    auto& d = displayService.display;
+    displayService.setContrast(false);   // so it can be read
+    d.clearDisplay();
+    d.setFont();
+    d.setTextSize(1);
+    d.setTextWrap(false);
+    d.setTextColor(SH110X_WHITE);
+    d.setCursor(13, 8);
+    d.print("Modo ahorro: me");
+    d.setCursor(13, 18);
+    d.print("duermo en " + String((left + 999) / 1000) + " s");
+    d.drawRect(4, 32, 120, 10, SH110X_WHITE);
+    int fill = (int)((116UL * left) / SAVER_WARN_MS);
+    if (fill > 0) d.fillRect(6, 34, fill, 6, SH110X_WHITE);
+    d.setCursor(16, 52);
+    d.print("Toca una tecla");
+    d.display();
+  }
+  return true;
 }
 
 // Each time the WiFi (re)connects: after a sleep, after a drop, or after
@@ -736,6 +863,8 @@ void loop() {
   // ← / → act on release (tap) or when held, so holding can remove a point.
   hardwareService.setArrowHoldMode(displayService.getCurrentScreen() == SCREEN_TRUCO && !infoPanel.isOpen() && !displayService.isShowingDetails());
   hardwareService.tick();
+  if (hardwareService.anyKeyDown()) lastUserInput = millis();   // a key held (games)
+  updatePowerSaver();
 
   if (sleepRequested) {
     sleepRequested = false;
@@ -772,6 +901,7 @@ void loop() {
 
 void updateScreen() {
   if (drawPowerOffBar()) return;
+  if (updateSaverSleep()) return;
 
   // A game is running: it gets the screen to itself (~60 frames/s, only
   // what changed goes to the panel). The WiFi is off meanwhile (battery).
@@ -857,14 +987,17 @@ void updateScreen() {
     unsigned long refreshInterval = nightModeService.getRefreshIntervalMs(activeAction);
 
     if (nightModeService.isRedrawDue(refreshInterval)) {
+      // battery saver: dimmed after a while without keys
+      bool saverDim = saverDimWanted();
+      saverDimmed = saverDim;
       if (nightModeService.isLatched()) {
         if (activeAction == 1 || isTemporarilyAwake) {
           displayService.setContrast(true);
         } else if (activeAction == 0) {
-          displayService.setContrast(false);
+          displayService.setContrast(saverDim);
         }
       } else {
-        displayService.setContrast(false);
+        displayService.setContrast(saverDim);
       }
 
       StateLock lock;
