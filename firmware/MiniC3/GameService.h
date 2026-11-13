@@ -5,12 +5,14 @@
 #include <Arduino.h>
 
 #include "Arkanoid.h"
+#include "Asteroids.h"
 #include "Flappy.h"
 #include "Game2048.h"
 #include "GameKeys.h"
 #include "Invaders.h"
 #include "Minesweeper.h"
 #include "PolledGame.h"
+#include "Pong.h"
 #include "Simon.h"
 #include "Snake.h"
 #include "Tetris.h"
@@ -37,6 +39,13 @@ public:
         for (PolledGame* g : polled) g->pause();
     }
 
+    // v1.13.0: a game is using ↑ as a held key (Pong, Asteroides): holding it
+    // must not turn the console off
+    bool upHoldBlocked() const {
+        PolledGame* g = activePolled();
+        return g && g->holdsUp();
+    }
+
     // Keys on the games screen. Returns true when it used the key.
     bool handleInput(InputEvent e);
 
@@ -49,8 +58,8 @@ public:
     void tickMenu(MiniOled& oled);
 
     // 0 Arkanoid, 1 Truco, then the polled games: Tetris, Flappy, Viborita,
-    // 2048, Buscaminas, Invasores, Simon
-    static const int POLLED_COUNT = 7;
+    // 2048, Buscaminas, Invasores, Simon, Asteroides, Pong
+    static const int POLLED_COUNT = 9;
     static const int GAME_COUNT = 2 + POLLED_COUNT;
 
 private:
@@ -63,7 +72,9 @@ private:
     Minesweeper mines;
     Invaders invaders;
     Simon simon;
-    PolledGame* const polled[POLLED_COUNT] = {&tetris, &flappy, &snake, &g2048, &mines, &invaders, &simon};
+    Asteroids asteroids;
+    Pong pong;
+    PolledGame* const polled[POLLED_COUNT] = {&tetris, &flappy, &snake, &g2048, &mines, &invaders, &simon, &asteroids, &pong};
 
     PolledGame* activePolled() const {
         for (PolledGame* g : polled) {

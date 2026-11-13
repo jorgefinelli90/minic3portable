@@ -24,6 +24,9 @@ public:
     // games menu: name and a small animation under it (y 30..52)
     virtual const char* title() const = 0;
     virtual void drawDemo(Adafruit_GFX& d, uint32_t now, int ox) {}
+    // v1.13.0: true while ↑ is a game key that is held down for a long time
+    // (Pong, Asteroides). Then holding ↑ 3 s does not turn the console off.
+    virtual bool holdsUp() const { return false; }
     // "Record 1234" by default (Buscaminas shows a time, Simon a length)
     virtual String recordText() const {
         return record() > 0 ? "Record " + String(record()) : String("Sin record");

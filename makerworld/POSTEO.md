@@ -9,7 +9,7 @@ Todo listo para copiar y pegar en cada campo del formulario de MakerWorld.
 **Español:**
 
 ```
-Mini C3 – Consola de bolsillo ESP32-C3 con 9 juegos y pantalla WiFi
+Mini C3 – Consola de bolsillo ESP32-C3 con 11 juegos y pantalla WiFi
 ```
 
 **English** (si lo publicás en inglés o agregás traducción):
@@ -74,7 +74,7 @@ Sugerencia: **CC BY 4.0 (Atribución)**. Es la que más se parece a la licencia 
 
 **Mini C3** es una consolita de bolsillo hecha con un **ESP32-C3-Zero**, una pantalla **OLED de 1,3"**, una cruz de 4 botones y un botón táctil. Entra en la palma de la mano: **47,5 × 86,5 × 18,6 mm**.
 
-Trae **9 juegos**, un **anotador de truco** y, cuando no estás jugando, se convierte en una **pantalla WiFi inteligente**: hora, clima, Spotify, mensajes, noticias y mucho más.
+Trae **11 juegos**, un **anotador de truco** y, cuando no estás jugando, se convierte en una **pantalla WiFi inteligente**: hora, clima, Spotify, mensajes, noticias y mucho más.
 
 🔗 **Firmware, código y binarios:** https://github.com/jorgefinelli90/minic3portable
 
@@ -83,6 +83,8 @@ Trae **9 juegos**, un **anotador de truco** y, cuando no estás jugando, se conv
 - **Arkanoid:** 6 niveles, ladrillos duros y cápsulas (paleta ancha, pelota lenta, multibola, vida extra).
 - **Truco contra la compu:** 1 contra 1, sin flor, a 15. La CPU simula manos para decidir… **y miente**. Tiene nivel Normal y Difícil.
 - **Tetris:** pozo completo de 10 × 16, sombra de caída y niveles.
+- **Asteroides:** la nave gira y acelera, las rocas se parten en dos y la pantalla da la vuelta.
+- **Pong** contra la compu: partidos a 7, y cada partido que ganás la compu juega mejor.
 - **Flappy**, **Viborita**, **2048**, **Buscaminas**, **Invasores** y **Simón**. En el Simón, el LED RGB de la placa se prende del color de cada flecha.
 
 Cada juego tiene una demo animada en el menú, pausa y récord guardado. Mientras jugás, el WiFi se apaga solo para ahorrar batería.
@@ -136,7 +138,7 @@ Batería → TP4056 → interruptor → 5V del C3-Zero. **Apagá el interruptor 
 ## 🛠️ Armado
 
 1. Grabá el firmware **antes de cerrar**.
-   - Desde Chrome, en esptool-js, cargá `minic3_v1.12.0_factory.bin` en la dirección **0x0**. No hay que instalar nada.
+   - Desde Chrome, en esptool-js, cargá `minic3_v1.13.0_factory.bin` en la dirección **0x0**. No hay que instalar nada.
 2. Teclas → pulsadores (calzan con un *clic*) → táctil → OLED → interruptor.
 3. Pegá el ESP32 y el cargador en la tapa con doble faz y cableá. Poné la batería con goma espuma.
 4. Cerrá la tapa a presión.
@@ -167,7 +169,7 @@ Lo adaptamos a nuestro proyecto:
 
 **Mini C3** is a palm-sized handheld built with a **Waveshare ESP32-C3-Zero**, a **1.3" OLED**, a 4-button D-pad and a touch button. Size: **47.5 × 86.5 × 18.6 mm**.
 
-It runs **9 games** and a **Truco score pad**. When you're not playing, it's a **smart WiFi display**: clock, weather, Spotify, messages, news and more.
+It runs **11 games** and a **Truco score pad**. When you're not playing, it's a **smart WiFi display**: clock, weather, Spotify, messages, news and more.
 
 🔗 **Firmware, source and binaries:** https://github.com/jorgefinelli90/minic3portable
 
@@ -175,7 +177,7 @@ It runs **9 games** and a **Truco score pad**. When you're not playing, it's a *
 
 - **Arkanoid:** 6 levels and power-ups.
 - **Truco vs CPU:** the Argentine card game, against a bluffing AI.
-- **Tetris**, **Flappy**, **Snake**, **2048**, **Minesweeper**, **Invaders** and **Simon** (the board's RGB LED lights up in each arrow's color).
+- **Tetris**, **Flappy**, **Snake**, **2048**, **Minesweeper**, **Invaders**, **Asteroids**, **Pong** (the CPU gets better with every match you win) and **Simon** (the board's RGB LED lights up in each arrow's color).
 
 Every game has an animated demo, pause and saved high score. WiFi turns off while you play to save battery.
 
@@ -221,7 +223,7 @@ Also:
 - Touch → GPIO 7.
 - Battery → TP4056 → switch → 5V pin.
 
-**Flashing:** flash `minic3_v1.12.0_factory.bin` at **0x0** with esptool-js in Chrome, then join the **MiniC3-Setup** WiFi (password `minic3setup`).
+**Flashing:** flash `minic3_v1.13.0_factory.bin` at **0x0** with esptool-js in Chrome, then join the **MiniC3-Setup** WiFi (password `minic3setup`).
 
 Full guide in the GitHub repo.
 

@@ -4,7 +4,7 @@
 
 La Mini C3 es una consolita de bolsillo con un **ESP32-C3-Zero**, una pantalla **OLED de 1,3"**, una cruz de 4 botones y un botón táctil. Viene en una caja impresa en 3D de **47,5 × 86,5 × 18,6 mm** que se imprime sin soportes y cierra a presión.
 
-Trae **9 juegos**, un **anotador de truco** y, cuando no jugás, funciona como **pantalla WiFi inteligente**: hora, clima, Spotify, mensajes, noticias y mucho más. Todo se configura desde el celular y el firmware se actualiza por WiFi.
+Trae **11 juegos**, un **anotador de truco** y, cuando no jugás, funciona como **pantalla WiFi inteligente**: hora, clima, Spotify, mensajes, noticias y mucho más. Todo se configura desde el celular y el firmware se actualiza por WiFi.
 
 *English summary at the end.*
 
@@ -39,6 +39,8 @@ Lo adaptamos a un formato portátil con botones:
 | **Buscaminas** | 16 × 7 con 16 minas. La primera casilla siempre es segura y tiene banderas y *chord*. |
 | **Invasores** | Dibujos propios, con refugios que se gastan, platillo y oleadas |
 | **Simón** | El LED RGB de la placa se prende del color de cada flecha |
+| **Asteroides** | Nave que gira y acelera, rocas que se parten en dos, pantalla que da la vuelta |
+| **Pong** | Contra la compu, partidos a 7: cada partido que ganás, la compu juega mejor |
 
 Cada juego tiene una demo animada en el menú, pausa y récord guardado. **Mientras jugás se apaga el WiFi** para ahorrar batería.
 
@@ -73,7 +75,7 @@ Además:
 |---|---|
 | [`caja/`](caja/) | STL listos para imprimir, modelos paramétricos en Python e instrucciones de armado y conexiones ([LEEME](caja/LEEME.md)) |
 | [`firmware/MiniC3/`](firmware/MiniC3/) | Código fuente (PlatformIO, librerías incluidas en `lib/`) y manual completo ([LEEME](firmware/MiniC3/LEEME.md)) |
-| [`firmware/binarios/`](firmware/binarios/) | `minic3_v1.12.0_factory.bin` (primera carga por USB) y `minic3_v1.12.0_ota.bin` (actualización por WiFi) |
+| [`firmware/binarios/`](firmware/binarios/) | `minic3_v1.13.0_factory.bin` (primera carga por USB) y `minic3_v1.13.0_ota.bin` (actualización por WiFi) |
 | [`imagenes/`](imagenes/) | Fotos, capturas y vistas de la caja |
 
 ## Materiales
@@ -107,7 +109,7 @@ Batería → TP4056 → interruptor → 5V del C3-Zero. **Apagá el interruptor 
 **Sin instalar nada** (Chrome o Edge):
 
 1. Entrá a [esptool-js](https://espressif.github.io/esptool-js/) y conectá la placa por USB-C.
-2. Cargá `firmware/binarios/minic3_v1.12.0_factory.bin` en la dirección **0x0** y programá.
+2. Cargá `firmware/binarios/minic3_v1.13.0_factory.bin` en la dirección **0x0** y programá.
    - Si no aparece la placa: mantené BOOT, tocá RESET y soltá BOOT.
 
 **Con PlatformIO:** abrí `firmware/MiniC3` y corré `pio run -e minic3 -t upload`.
@@ -141,14 +143,14 @@ Los controles de cada juego están en el [manual del firmware](firmware/MiniC3/L
 
 **Mini C3** is a pocket handheld built around a **Waveshare ESP32-C3-Zero**, a **1.3" SH1106 OLED**, a 4-button D-pad and a TTP223 touch button, in a support-free, snap-fit 3D-printed case (47.5 × 86.5 × 18.6 mm).
 
-- **9 games:** Arkanoid, Truco (Argentine card game) vs a bluffing CPU, Tetris, Flappy, Snake, 2048, Minesweeper, Invaders and Simon.
+- **11 games:** Arkanoid, Truco (Argentine card game) vs a bluffing CPU, Tetris, Flappy, Snake, 2048, Minesweeper, Invaders, Simon, Asteroids and Pong.
 - **Truco score pad.**
 - **Smart WiFi display:** clock, weather, Spotify, messages, news, stocks/crypto, PC monitor, Bambu printer and more.
 - **Web configuration panel** and **OTA updates**.
 
 The firmware is based on **[Tinytosh](https://makerworld.com/es/models/2270326-tinytosh-mini-retro-pc-smart-wifi-display-esp32)** by Uladzimir Hitsarau (MIT), adapted for a portable, button-driven device. The UI is in Spanish.
 
-- Flash `firmware/binarios/minic3_v1.12.0_factory.bin` at **0x0** with [esptool-js](https://espressif.github.io/esptool-js/), then join the **MiniC3-Setup** WiFi (password `minic3setup`, page `192.168.4.1`) to configure.
+- Flash `firmware/binarios/minic3_v1.13.0_factory.bin` at **0x0** with [esptool-js](https://espressif.github.io/esptool-js/), then join the **MiniC3-Setup** WiFi (password `minic3setup`, page `192.168.4.1`) to configure.
 - Print the STLs in `caja/stl/`. Wiring and assembly are in `caja/LEEME.md`.
 
 ## Licencia

@@ -287,8 +287,10 @@ void GameService::drawMenu(Adafruit_GFX& d, uint32_t now) {
     d.setTextColor(SH110X_BLACK);
     d.setCursor(2, 1);
     d.print("JUEGOS");
-    d.setCursor(86, 1);
-    d.print(String(selected + 1) + "/" + String(GAME_COUNT));
+    // "n/11", right-aligned against the gamepad
+    String count = String(selected + 1) + "/" + String(GAME_COUNT);
+    d.setCursor(107 - (int)count.length() * 6, 1);
+    d.print(count);
     // little gamepad
     d.fillRoundRect(110, 2, 14, 7, 3, SH110X_BLACK);
     d.drawFastHLine(112, 5, 3, SH110X_WHITE);

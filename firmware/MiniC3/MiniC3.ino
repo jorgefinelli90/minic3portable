@@ -330,6 +330,7 @@ void handleInput(InputEvent event, bool repeat) {
   }
 
   if (event == INPUT_UP_LONG) {
+    if (gameService.upHoldBlocked()) return;   // Pong / Asteroides: ↑ is a game key
     sleepRequested = true;   // done from loop(), outside the state lock
     return;
   }
@@ -644,7 +645,7 @@ bool drawPowerOffBar() {
   static bool shown = false;
   static uint32_t lastDraw = 0;
 
-  uint32_t held = hardwareService.upHeldMs();
+  uint32_t held = gameService.upHoldBlocked() ? 0 : hardwareService.upHeldMs();
   const uint32_t showAfter = 700;
 
   if (held > showAfter) {

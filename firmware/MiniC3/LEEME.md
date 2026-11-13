@@ -1,4 +1,4 @@
-# Mini C3 — firmware v1.12.0
+# Mini C3 — firmware v1.13.0
 
 Firmware para la Mini C3, adaptado de **Tinytosh** de Vladimir Gitsarev (licencia MIT, ver `LICENSE`).
 
@@ -9,7 +9,7 @@ Hardware:
 - Táctil TTP223 como botón A.
 - Batería opcional en GPIO 0.
 
-Pantallas: hora, Spotify, **juegos (Arkanoid, truco contra la compu, Tetris, Flappy, Viborita, 2048, Buscaminas, Invasores y Simón)**, **anotador de truco**, calendario, clima, luz del día, luna, ISS, acciones, cripto, monedas, noticias, mensajes, monitor de PC e impresora Bambu (calidad del aire y población se quitaron en v1.4.1; vuelos en v1.11.0). Se configuran desde el panel web.
+Pantallas: hora, Spotify, **juegos (Arkanoid, truco contra la compu, Tetris, Flappy, Viborita, 2048, Buscaminas, Invasores, Simón, Asteroides y Pong)**, **anotador de truco**, calendario, clima, luz del día, luna, ISS, acciones, cripto, monedas, noticias, mensajes, monitor de PC e impresora Bambu (calidad del aire y población se quitaron en v1.4.1; vuelos en v1.11.0). Se configuran desde el panel web.
 
 ## Al prender
 
@@ -70,7 +70,7 @@ Se cierra sola a los 20 s sin tocar nada.
 
 ## Juegos (tercera pantalla)
 
-El menú muestra un juego por vez con una demo animada. **← / →** cambian de juego (Arkanoid · Truco · Tetris · Flappy · Viborita · 2048 · Buscaminas · Invasores · Simón) y **A** lo arranca. Arriba a la derecha dice cuál de los 9 estás viendo, y abajo el récord de cada uno.
+El menú muestra un juego por vez con una demo animada. **← / →** cambian de juego (Arkanoid · Truco · Tetris · Flappy · Viborita · 2048 · Buscaminas · Invasores · Simón · Asteroides · Pong) y **A** lo arranca. Arriba a la derecha dice cuál de los 11 estás viendo, y abajo el récord de cada uno.
 
 **Arkanoid**
 | Tecla | Qué hace |
@@ -189,6 +189,34 @@ Un pajarito propio que vuela entre columnas de ladrillos.
 - Cada flecha se prende en la pantalla y en el **LED con su color**: ↑ verde, → rojo, ↓ amarillo, ← azul.
 - Cada ronda suma una más y va un poco más rápido. El récord es la secuencia más larga que completaste.
 
+**Asteroides**
+
+| Tecla | Qué hace |
+|---|---|
+| ← / → | Giran la nave |
+| ↑ | Acelera (la nave sigue de largo y frena de a poco) |
+| A | Dispara. Mantenida, dispara sola. Hasta 4 tiros a la vez. |
+| ↓ | Pausa |
+| Al perder | A juega otra vez · ← vuelve al menú |
+
+- La pantalla da la vuelta: lo que sale por un borde entra por el otro.
+- Piedra grande 20 puntos, mediana 50 y chica 100. Las grandes se parten en 2 medianas, y las medianas en 2 chicas.
+- 3 vidas, y una más cada 5000 puntos (hasta 5). Al volver, la nave titila 2,5 s y las piedras la atraviesan.
+- Cada oleada trae una piedra más (hasta 6) y un poco más rápidas.
+
+**Pong** contra la compu
+
+| Tecla | Qué hace |
+|---|---|
+| ↑ / ↓ | Mueven tu paleta (la de la izquierda) |
+| A | Pausa |
+| Al terminar | A juega el partido siguiente (o vuelve al 1 si perdiste) · ← vuelve al menú |
+
+- Partidos a 7. Donde pega la pelota en la paleta decide el ángulo: en las puntas sale más cruzada. Cada golpe la acelera un poco.
+- Cada partido que ganás seguido, la compu reacciona antes, se mueve más rápido y erra menos. El récord es la **racha** más larga de partidos ganados.
+
+> En Asteroides y Pong la ↑ se mantiene apretada para jugar, así que ahí **mantener ↑ no apaga la consola**. Para apagarla, pausá primero (↓ en Asteroides, A en Pong) y ahí sí mantené ↑ 3 s.
+
 **Truco contra la compu** (1 contra 1, sin flor, a 15)
 
 | Tecla | Qué hace |
@@ -303,7 +331,7 @@ El WiFi es lo que más batería gasta, y los juegos y el anotador no lo necesita
 
 ## Apagado (suspensión)
 
-- Mantené ↑ 3 segundos: se apagan la pantalla, el WiFi y el LED. Lo que tenía en memoria queda guardado.
+- Mantené ↑ 3 segundos: se apagan la pantalla, el WiFi y el LED. Lo que tenía en memoria queda guardado. (Jugando a Asteroides o Pong, pausá primero: ahí ↑ es una tecla del juego.)
 - Solo **← o →** la prenden, al instante y en la misma pantalla. El táctil y ↓ no la despiertan, así se puede llevar en el bolsillo. El WiFi vuelve solo en unos segundos y después se actualizan los datos.
 - Es *light sleep* y no *deep sleep* porque el ESP32-C3 solo puede despertar de deep sleep con los GPIO 0 a 5: → (GPIO 6) no podría prenderla.
 - La placa sigue consumiendo un poco: el LED RGB y el regulador de la C3-Zero gastan más que el chip dormido. Para guardarla varios días, usá el interruptor.
@@ -401,6 +429,7 @@ A partir de ahora todo se actualiza sin cable, de dos formas:
 - `Tetris` y `Flappy`: los juegos 3 y 4 (nuevo en v1.10.0).
 - `PolledGame` y `GameUi`: base común de los juegos nuevos (pausa, pantalla final, récords, LED) (nuevo en v1.11.0).
 - `Snake`, `Game2048`, `Minesweeper`, `Invaders` y `Simon`: Viborita, 2048, Buscaminas, Invasores y Simón (nuevo en v1.11.0).
+- `Asteroids` y `Pong`: Asteroides y Pong contra la compu (nuevo en v1.13.0).
 - `TrucoEngine`, `TrucoAI` y `TrucoGame`: el truco contra la compu (nuevo en v1.8.0).
 - `TrucoService`: el anotador de truco (nuevo en v1.7.0). `HardwareService` ahora sabe distinguir toque y mantener en ← → para esta pantalla.
 - `structs.h`, `JsonSerializer.cpp`, `ConfigManager.cpp`, `DataSyncService.cpp`: ajustes chicos.
